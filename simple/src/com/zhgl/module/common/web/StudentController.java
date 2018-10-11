@@ -8,17 +8,25 @@ import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import sun.util.logging.resources.logging;
+
+import com.sun.org.apache.regexp.internal.recompile;
+import com.zhgl.module.bean.IdentityGenerator;
 import com.zhgl.module.common.ebean.Project;
 import com.zhgl.module.common.ebean.Student;
 import com.zhgl.module.common.service.StudentService;
 import com.zhgl.module.common.service.StudentServiceBean;
+import com.zhgl.module.document.ebean.Category;
+import com.zhgl.util.WebUtil;
 import com.zhgl.util.dao.PageView;
+import com.zhgl.util.dao.QueryResult;
 
 @Controller
 @RequestMapping("/stu/")
@@ -31,13 +39,20 @@ public class StudentController {
 	
 	private int maxresult = 3;
 	
-	@RequestMapping("save")
-	public void save(Student student){
-		studentService.save(student);
-		listAllPage(1,"");
+	@RequestMapping("create")
+	public ModelAndView create() {
+		ModelAndView mav = new ModelAndView("student/student_create");
+		return mav;
 	}
 	
-	@RequestMapping("listAll")
+	@RequestMapping("save")
+	public ModelAndView save(@ModelAttribute Student student){
+		ModelAndView mav = new ModelAndView("student/student_create");
+		studentService.save(student);
+		return mav;
+	}
+	
+	/*@RequestMapping("listAll")
 	@ResponseBody
 	public List listAll(@RequestParam(required = false, defaultValue = "1") int page){
 		PageView<Student> pageView = new PageView<>(maxresult, page);
@@ -51,18 +66,32 @@ public class StudentController {
 				params.toArray(), orderby));
 		
 		return pageView.getRecords();
-	}
+	}*/
 	
 	@RequestMapping("delete")
-	public void delete(@RequestParam long id){
-		studentService.delete(id);
-		listAllPage(1,"");
+	@ResponseBody
+	public String delete(@RequestParam String name){
+		Student entity = studentService.findByName(name);
+		entity.setVisible(false);
+		studentService.update(entity);
+		return "success";
+	}
+	
+	@RequestMapping("edit")
+	public ModelAndView edit(String name) {
+		ModelAndView mav = new ModelAndView("student/student_edit");
+		Student student = studentService.findByName(name);
+		mav.addObject("student", student);
+		return mav;
 	}
 	
 	@RequestMapping("update")
-	public void update(Student student){
-		studentService.update(student);
-		listAllPage(1,"");
+	public ModelAndView update(@ModelAttribute Student student){
+		ModelAndView mav = new ModelAndView("student/student_edit");
+		Student entity = studentService.findByName(student.getName());
+		entity.setAge(entity.getAge());
+		studentService.update(entity);
+		return mav;
 	}
 	
 	/**
@@ -72,26 +101,34 @@ public class StudentController {
 	 * @return
 	 */
 	@RequestMapping("listAllPage")
-	@ResponseBody
-	public List listAllPage(@RequestParam(required = false, defaultValue = "1") int page,
+	public ModelAndView listAllPage(@RequestParam(required = false, defaultValue = "1") int page,
 			@RequestParam(required = false,defaultValue="") String keyword){
+		StringBuffer jpql = null;
+		ModelAndView mav = new ModelAndView("student/student_list");
 		PageView<Student> pageView = new PageView<>(maxresult, page);
-		
-		LinkedHashMap<String, String> orderby = new LinkedHashMap<String, String>();
-		orderby.put("number", "asc");
-		StringBuffer jpql = new StringBuffer("o.number like ?1 or o.name like?2");
 		List<Object> params = new ArrayList<Object>();
-		params.add("%"+keyword+"%");
-		params.add("%"+keyword+"%");
+		LinkedHashMap<String, String> orderby = new LinkedHashMap<String, String>();
+		orderby.put("age", "asc");
 		
-		pageView.setQueryResult(studentService.getScrollData(pageView.getFirstResult(), maxresult, jpql.toString(),
-				params.toArray(), orderby));
+		jpql = new StringBuffer("o.visible=?1");
+		params.add(true);
+		//params.add("%"+keyword+"%");
+		System.out.println(params);
+		System.out.println(pageView.getFirstResult());
+		System.out.println(jpql);
+		System.out.println(orderby);
+		QueryResult<Student> qResult= studentService.getScrollData(pageView.getFirstResult(), maxresult, jpql.toString(),
+				params.toArray(), orderby);
+		pageView.setQueryResult(qResult);
+		List<Student> list = pageView.getRecords();
+		for (Student student : list) {
+			System.out.print(student.getName()+student.getAge());
+		}
+		mav.addObject("pageView",pageView);
+		mav.addObject("page",page);
+		mav.addObject("keyword",keyword);
 		
-		return pageView.getRecords();
-		
-		/*mav = new ModelAndView().addObject("listall", list);
-		mav.setViewName("student/index");
-		return mav;*/
+		return mav;
 	}
 	
 	

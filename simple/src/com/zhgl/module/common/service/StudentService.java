@@ -3,6 +3,7 @@ package com.zhgl.module.common.service;
 import java.util.List;
 
 import com.zhgl.module.common.ebean.Student;
+import com.zhgl.module.document.ebean.Category;
 import com.zhgl.util.dao.DAO;
 
 public interface StudentService extends DAO<Student> {
@@ -19,8 +20,8 @@ public interface StudentService extends DAO<Student> {
 	
 	void delete(int id);
 	
-	void update1(Student student);
+	//void update1(Student student);
 	
-	
+	Student findByName(String name);
 	
 }

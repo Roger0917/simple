@@ -13,6 +13,8 @@ import lombok.Setter;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.zhgl.util.security.MD5;
+
 @Getter
 @Setter
 @MappedSuperclass
@@ -34,6 +36,10 @@ public class BaseEntity implements Serializable {
 
 	public BaseEntity() {
 
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(MD5.MD5Encode("123456"));
 	}
 
 }

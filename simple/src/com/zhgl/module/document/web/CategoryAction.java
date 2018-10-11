@@ -40,7 +40,7 @@ public class CategoryAction {
 
 	@Autowired
 	private HttpServletRequest request;
-	private int maxresult = 15;
+	private int maxresult = 3;
 
 	@RequestMapping("/list")
 	public ModelAndView list(@RequestParam(required = false) String projectId,

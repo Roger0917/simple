@@ -6,19 +6,23 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.zhgl.module.bean.BaseEntity;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "t_student")
-public class Student {
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+public class Student extends BaseEntity {	
 	private String number;	//学号
 	private String name;
 	private	char sex;
-	private int age;
+	private Integer age;
+	
+	public static void main(String[] args) {
+		String str="";
+		System.out.println(str.charAt(0));
+	}
 	
 	public Student() {
 		
@@ -32,13 +36,6 @@ public class Student {
 		this.age = age;
 	}
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public String getNumber() {
 		return number;

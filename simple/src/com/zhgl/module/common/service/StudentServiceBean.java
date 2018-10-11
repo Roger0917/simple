@@ -2,10 +2,14 @@ package com.zhgl.module.common.service;
 
 import java.util.List;
 
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+
 import org.springframework.stereotype.Service;
 
 import com.zhgl.module.common.ebean.Member;
 import com.zhgl.module.common.ebean.Student;
+import com.zhgl.module.document.ebean.Category;
 import com.zhgl.util.dao.DAOSupport;
 
 @Service
@@ -44,17 +48,27 @@ public class StudentServiceBean extends DAOSupport<Student> implements StudentSe
 		 this.delete(id);
 	}
 
-	@Override
-	public void update1(Student student) {
-		// TODO Auto-generated method stub
-		this.update(student);
-	}
+	
 
 	@Override
 	public List<Student> listByNumOrName(String arg) {
 		// TODO Auto-generated method stub
 		return em.createQuery("select o from Student o where o.number like?1 or o.name like?2")
 				.setParameter(1, arg).setParameter(2, arg).getResultList();
+	}
+
+	@Override
+	public Student findByName(String name) {
+		Query query = em.createQuery("select o from Student o where o.name like?1")
+				.setParameter("visible", true).setParameter("name", name);
+		try {
+			Student student = (Student) query.getSingleResult();
+			return student;
+		} catch (NoResultException nre) {
+
+		} catch (Exception e) {
+		}
+		return null;
 	}
 
 }

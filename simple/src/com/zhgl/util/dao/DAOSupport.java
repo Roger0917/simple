@@ -102,8 +102,8 @@ public abstract class DAOSupport<T> implements DAO<T> {
 			query.setFirstResult(startIndex);
 			query.setMaxResults(maxresult);
 		}
-
-		qr.setResultList(query.getResultList());
+		System.out.println("--------"+query.getResultList());
+		qr.setResultList(query.getResultList()); 
 
 		query = em.createQuery("select count("
 				+ this.getCountField(this.entityClazz) + ") from " + entityName
